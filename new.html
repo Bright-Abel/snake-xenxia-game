@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game with High Score</title>
+    <style>
+        #game-board {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 1px solid #000;
+        }
+        
+        .snake {
+            position: absolute;
+            background-color: green;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .food {
+            position: absolute;
+            background-color: red;
+            width: 20px;
+            height: 20px;
+        }
+        
+        #score {
+            margin-top: 10px;
+        }
+        
+        #high-score {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="game-board"></div>
+        <div id="score">Score: 0</div>
+        <div id="high-score">High Score: 0</div>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('high-score');
+
+        const gridSize = 15;
+        const cellSize = gameBoard.clientWidth / gridSize;
+        let snake = [{
+            x: 5,
+            y: 5
+        }];
+        let food = generateFood();
+        let direction = 'right';
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+
+        function generateFood() {
+            const foodX = Math.floor(Math.random() * gridSize);
+            const foodY = Math.floor(Math.random() * gridSize);
+            return {
+                x: foodX,
+                y: foodY
+            };
+        }
+
+        function draw() {
+            gameBoard.innerHTML = '';
+
+            // Draw snake
+            snake.forEach(segment => {
+                const snakeElement = document.createElement('div');
+                snakeElement.className = 'snake';
+                snakeElement.style.left = segment.x * cellSize + 'px';
+                snakeElement.style.top = segment.y * cellSize + 'px';
+                gameBoard.appendChild(snakeElement);
+            });
+
+            // Draw food
+            const foodElement = document.createElement('div');
+            foodElement.className = 'food';
+            foodElement.style.left = food.x * cellSize + 'px';
+            foodElement.style.top = food.y * cellSize + 'px';
+            gameBoard.appendChild(foodElement);
+        }
+
+        function update() {
+            // Move snake
+            const head = Object.assign({}, snake[0]); // Create a new object to avoid reference issues
+            switch (direction) {
+                case 'up':
+                    head.y = (head.y - 1 + gridSize) % gridSize;
+                    break;
+                case 'down':
+                    head.y = (head.y + 1) % gridSize;
+                    break;
+                case 'left':
+                    head.x = (head.x - 1 + gridSize) % gridSize;
+                    break;
+                case 'right':
+                    head.x = (head.x + 1) % gridSize;
+                    break;
+            }
+
+            // Check for collision with food
+            if (head.x === food.x && head.y === food.y) {
+                snake.unshift(food);
+                food = generateFood();
+                score += 10;
+                scoreElement.textContent = 'Score: ' + score;
+
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreElement.textContent = 'High Score: ' + highScore;
+                    localStorage.setItem("highScore", highScore);
+                }
+            } else {
+                // Remove the tail if no collision with food
+                snake.pop();
+            }
+
+            // Check for collision with itself
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                alert('Game Over! Your Score: ' + score);
+                resetGame();
+            }
+
+            // Update snake with the new head
+            snake.unshift(head);
+        }
+
+        function resetGame() {
+            snake = [{
+                x: 5,
+                y: 5
+            }];
+            food = generateFood();
+            direction = 'right';
+            score = 0;
+            scoreElement.textContent = 'Score: 0';
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+        }
+
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowUp':
+                    direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    direction = 'down';
+                    break;
+                case 'ArrowLeft':
+                    direction = 'left';
+                    break;
+                case 'ArrowRight':
+                    direction = 'right';
+                    break;
+            }
+        });
+
+        // Initialize high score on page load
+        highScoreElement.textContent = 'High Score: ' + highScore;
+
+        setInterval(gameLoop, 100);
+    </script>
+</body>
+
+</html>

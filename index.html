@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app-cont">
+      <div class="btn-container">
+        <button type="button" class="hard" data-id="easy">easy</button>
+        <button type="button" class="hard" data-id="medium">medium</button>
+        <button type="button" class="hard" data-id="hard">hard</button>
+      </div>
+      <div class="game-container">
+        <div id="gameCont">
+          <canvas id="canvas" width="400" height="400"></canvas>
+          <div id="scoreVal">0</div>
+          <div class="resetBtn">
+            <button id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="scoreBoard">
+          <div class="score">
+            <h5 class="myScr"></h5>
+            <p class="highScore"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
